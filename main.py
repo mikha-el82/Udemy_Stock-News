@@ -19,17 +19,22 @@ alpha_vantage_parameters = {
 av_response = requests.get(alpha_vantage_endpoint, params=alpha_vantage_parameters)
 av_response.raise_for_status()
 av_data = av_response.json()
-print(av_data)
+# print(av_data)
 
 av_time_series = av_data["Time Series (Daily)"]
-print(av_time_series)
+# print(av_time_series)
 
 # Checking if today is in dates
 all_dates = list(av_time_series.keys())
-if str(date.today) in all_dates:
+if str(date.today()) in all_dates:
     print("Yes - it is.")
 else:
     print("Nope, not here...")
+
+# Use to see if yesterday there was stock trading day
+today = date.today()
+today_day = today.day
+print(today_day)
 
 last_day = list(av_time_series.keys())[0]  # using the fact that dicts are now ordered
 day_before = list(av_time_series.keys())[1]  # using the fact that dicts are now ordered
@@ -44,13 +49,11 @@ print(f"Closing price day before: {closing_price_day_before}.")
 change_percents = 100 * (closing_price_last_day - closing_price_day_before) / closing_price_day_before
 if change_percents > 0:
     symbol = "▲"
-if change_percents < 0:
+elif change_percents < 0:
     symbol = "▼"
+else:
+    symbol = ""
 print(f"Change: {symbol} {abs(round(change_percents, 2))}%.")
-
-# Use to see if yesterday there was stock trading day
-# today = date.today()
-# print(today)
 
 
 ## STEP 2: Use https://newsapi.org
@@ -69,7 +72,7 @@ news_parameters = {
 news_response = requests.get(news_endpoint, params=news_parameters)
 news_response.raise_for_status()
 news_data = news_response.json()
-print(news_data)
+# print(news_data)
 
 for article in news_data["articles"]:
     print(f"Headline: {article['title']}")
