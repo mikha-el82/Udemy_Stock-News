@@ -1,8 +1,6 @@
 import requests
 import os
 import datetime
-## STEP 1: Use https://www.alphavantage.co
-# When STOCK price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
 
 # Company and stock information
 STOCK = "TSLA"
@@ -13,6 +11,10 @@ SIGNIFICANT_CHANGE = 1  # in %
 today = datetime.date.today()
 # print(f"Today: {today}")
 ARTICLES_NEWER_THAN = 27  # days
+
+# Use of sms and / or console log
+SEND_SMS = False
+CONSOLE_LOG = True
 
 
 def check_day():
@@ -150,9 +152,11 @@ if new_trade_data_available:
     # If the change is not significant, the script ends
     if significant_change:
         articles_string = news_api_request()
-        print(change_string)
-        print(articles_string)
-        send_sms()
+        if CONSOLE_LOG:
+            print(change_string)
+            print(articles_string)
+        if SEND_SMS:
+            send_sms()
 
 ## STEP 3: Use https://www.twilio.com
 # Send a seperate message with the percentage change and each article's title and description to your phone number. 
