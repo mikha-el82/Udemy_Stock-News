@@ -8,8 +8,8 @@ COMPANY_NAME = "Tesla Inc"
 SIGNIFICANT_CHANGE = 1  # in %
 
 # Date and articles age limit
-today = datetime.date.today()
-# print(f"Today: {today}")
+TODAY = datetime.date.today()
+# print(f"Today: {TODAY}")
 ARTICLES_NEWER_THAN = 27  # days
 
 # Use of sms and / or console log
@@ -24,19 +24,19 @@ def check_day():
     other --> trading yesterday and day before
     :return: last_day (datetime), day_before (datetime), new_data (bool)
     """
-    today_weekday = today.weekday()
+    today_weekday = TODAY.weekday()
     last_day = "none"  # string to return in case of no trading
     day_before = "none" # string to return in case of no trading
     if today_weekday == 6 or today_weekday == 0:  # Sunday or Monday = no trading yesterday = no change of price
         print("Last stock day was on Friday - no new data.")
         new_data = False  # No need to search for data
     elif today_weekday == 1:  # Tuesday = trading day on Monday (-1 day) and on Friday (-4 days)
-        last_day = today - datetime.timedelta(days=1)
-        day_before = today - datetime.timedelta(days=4)
+        last_day = TODAY - datetime.timedelta(days=1)
+        day_before = TODAY - datetime.timedelta(days=4)
         new_data = True
     else:  # trading day yesterday (-1 day) and day before (-2 days)
-        last_day = today - datetime.timedelta(days=1)
-        day_before = today - datetime.timedelta(days=2)
+        last_day = TODAY - datetime.timedelta(days=1)
+        day_before = TODAY - datetime.timedelta(days=2)
         new_data = True
 
     # print(f"Last trading day was: {last_day}.\nDay before was: {day_before}.")
@@ -117,7 +117,7 @@ def news_api_request():
     for article in news_data["articles"]:
         published_date_str = article['publishedAt'][:10]
         published_date_datetime = datetime.datetime.strptime(published_date_str, "%Y-%m-%d").date()
-        published_days_before = (today - published_date_datetime).days
+        published_days_before = (TODAY - published_date_datetime).days
         # print(f"Published {published_days_before} days before.")
         # Skip articles older than limit
         if published_days_before > ARTICLES_NEWER_THAN:
