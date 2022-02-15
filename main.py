@@ -22,7 +22,7 @@ def check_day():
     Sunday or Monday --> no trading yesterday, new_data = False
     Tuesday --> trading on Monday and before that on Friday
     other --> trading yesterday and day before
-    :return: last_day (datetime), day_before (datetime), new_data (bool)
+    :return: last_day (datetime.date), day_before (datetime.date), new_data (bool)
     """
     today_weekday = TODAY.weekday()
     last_day = "none"  # string to return in case of no trading
@@ -47,8 +47,8 @@ def check_day():
 def alpha_vantage_request(last_day, day_before):
     """
     Alpha Vantage API request for STOCK company
-    :param last_day: last day of stock trading
-    :param day_before: the day before last day of stock trading
+    :param last_day: (datetime.date) last day of stock trading
+    :param day_before: (datetime.date) the day before last day of stock trading
     :return: change_str (str), is_significant (bool) - if the price change is above SIGNIFICANT_CHANGE limit
     """
     av_api_key = os.environ.get("AV_API_KEY")
