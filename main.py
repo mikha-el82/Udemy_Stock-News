@@ -1,20 +1,21 @@
 import requests
 import os
 import datetime
+from twilio.rest import Client
 
 # Company and stock information
 STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
-SIGNIFICANT_CHANGE = 1  # in %
+SIGNIFICANT_CHANGE = 5  # stock price change in %
 
 # Date and articles age limit
 TODAY = datetime.date.today()
 # print(f"Today: {TODAY}")
-ARTICLES_NEWER_THAN = 27  # days
+ARTICLES_NEWER_THAN = 1  # days
 
 # Use of sms and / or console log
-SEND_SMS = False
-CONSOLE_LOG = True
+CONSOLE_LOG = True  # only writes the message in console
+SEND_SMS = False  # sends sms via Twilio
 
 
 def check_day():
@@ -47,8 +48,8 @@ def check_day():
 def alpha_vantage_request(last_day, day_before):
     """
     Alpha Vantage API request for STOCK company
-    :param last_day: (datetime.date) last day of stock trading
-    :param day_before: (datetime.date) the day before last day of stock trading
+    :param last_day (datetime.date) - last day of stock trading
+    :param day_before (datetime.date) - the day before last day of stock trading
     :return: change_str (str), is_significant (bool) - if the price change is above SIGNIFICANT_CHANGE limit
     """
     av_api_key = os.environ.get("AV_API_KEY")
@@ -86,7 +87,7 @@ def alpha_vantage_request(last_day, day_before):
         is_significant = False
         # print(f"Change is {change_percents} = nothing important...")
 
-    change_str = f"{STOCK}: {symbol} {abs_percents}%."
+    change_str = f"{STOCK}: {symbol} {abs_percents}%.\n-----"
     # print(change_str)
 
     return change_str, is_significant
@@ -137,12 +138,23 @@ def news_api_request():
     return articles_str
 
 
-def send_sms():
+# Twilio sms service
+def send_sms(change_str, articles_str):
     """
     Sends formatted sms using Twilio
+    :param: change_str: (str) stock price change string
+    :param: articles_str: (str) formatted articles
     :return: none at the moment
     """
-    pass
+    account_sid = "AC9cb771b79c76d1804aade1524829bdd4"
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+    client = Client(account_sid, auth_token)
+    message = client.messages.create(
+        body=f"{change_str}\n{articles_str}",
+        from_="+18456405249",
+        to="+420728403591"
+    )
+    print(f"Sms status: {message.status}")
 
 
 last_trading_day, day_before_trading_day, new_trade_data_available = check_day()
@@ -155,8 +167,14 @@ if new_trade_data_available:
         if CONSOLE_LOG:
             print(change_string)
             print(articles_string)
+        else:
+            print("Console log disabled.")
         if SEND_SMS:
-            send_sms()
+            send_sms(change_string, articles_string)
+        else:
+            print("Sms sending disabled.")
+    else:
+        print("No significant stock change - nothing to send.")
 
 # STEP 3: Use https://www.twilio.com
 # Send a seperate message with the percentage change and each article's title and description to your phone number.
